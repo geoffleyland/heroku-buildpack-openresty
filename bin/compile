@@ -45,7 +45,7 @@ if [ "$MAKE_CACHE" = "1" ]; then
   wget -O - http://luarocks.org/releases/luarocks-$LUAROCKS_VERSION.tar.gz | tar xz
   cd luarocks-$LUAROCKS_VERSION
   ./configure \
-    --prefix=$CACHE_DIR \
+    --prefix=$BUILD_DIR \
     --with-lua=$BUILD_DIR \
     --with-lua-include=$BUILD_DIR/include/luajit-2.1 \
     --rocks-tree=$BUILD_DIR/lib/luarocks
