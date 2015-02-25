@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
 # bin/release <build-dir>
 
-BUILD_DIR=$1
-
 cat << EOF
 ---
 config_vars:
-  PATH: $BUILD_DIR/bin:/usr/local/bin:/usr/bin:/bin
-  LD_LIBRARY_PATH: $BUILD_DIR/lib
-  LUA_CPATH: ./?.so;$BUILD_DIR/lib/lua/5.1/?.so;$BUILD_DIR/lib/lualib/?.so
-  LUA_PATH: ./?.lua;$BUILD_DIR/share/lua/5.1/?.lua;$BUILD_DIR/lua/5.1/?/init.lua;;$BUILD_DIR/lib/lualib/?.lua
+  PATH: /app/tools/bin:/usr/local/bin:/usr/bin:/bin
+  LD_LIBRARY_PATH: /app/tools/lib
   STACK: $STACK
 EOF
