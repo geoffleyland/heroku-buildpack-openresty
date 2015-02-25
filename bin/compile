@@ -35,7 +35,7 @@ fi
 cp $CACHE_DIR/openresty/luajit/bin/luajit-2.1.0-alpha $BUILD_DIR/bin/lua
 cp $CACHE_DIR/openresty/luajit/lib/libluajit-5.1.so.2.1.0 $BUILD_DIR/lib/lubluajit-5.1.so.2
 cp -r $CACHE_DIR/openresty/luajit/include/luajit-2.1 $BUILD_DIR/include/luajit-2.1
-cp $CACHE_DIR/openresty/nginx/bin/nginx $BUILD_DIR/sbin/nginx
+cp $CACHE_DIR/openresty/nginx/sbin/nginx $BUILD_DIR/bin/nginx
 cp -r $CACHE_DIR/openresty/lualib $BUILD_DIR/lib/lualib
 
 if [ "$MAKE_CACHE" = "1" ]; then
