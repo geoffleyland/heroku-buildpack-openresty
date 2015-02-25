@@ -50,7 +50,7 @@ if [ ! -d "$CACHE_DIR/luarocks-$LUAROCKS_VERSION" ]; then
   wget -O - http://luarocks.org/releases/luarocks-$LUAROCKS_VERSION.tar.gz | tar xz
   cd luarocks-$LUAROCKS_VERSION
   ./configure \
-    --prefix=/app/toools \
+    --prefix=/app/tools \
     --with-lua=/app/tools \
     --with-lua-include=/app/tools/include/luajit-2.1 \
     --rocks-tree=/app/tools/lib/luarocks
