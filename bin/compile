@@ -20,24 +20,26 @@ if [ ! -d "$CACHE_DIR" ]; then
   MAKE_CACHE=1
 fi
 
+cd $CACHE_DIR
 if [ "$MAKE_CACHE" = "1" ]; then
   echo "-----> Building openresty"
-  cd $CACHE_DIR
   wget -O - http://openresty.org/download/ngx_openresty-$OPENRESTY_VERSION.tar.gz | tar xz
   cd ngx_openresty-$OPENRESTY_VERSION
-  PATH=$PATH:/sbin ./configure --prefix=$CACHE_DIR/openresty --with-pcre-jit --with-ipv6
+  PATH=$PATH:/sbin ./configure --prefix=$BUILD_DIR/openresty --with-pcre-jit --with-ipv6
   make
-  make install
   cd ..
-  rm -rf ngx_openresty-$OPENRESTY_VERSION
 fi
+echo "-----> Installing openresty"
+cd ngx_openresty-$OPENRESTY_VERSION
+make install
 
-cp $CACHE_DIR/openresty/luajit/bin/luajit-2.1.0-alpha $BUILD_DIR/bin/lua
-cp $CACHE_DIR/openresty/luajit/lib/libluajit-5.1.so.2.1.0 $BUILD_DIR/lib/lubluajit-5.1.so.2
-cp -r $CACHE_DIR/openresty/luajit/include/luajit-2.1 $BUILD_DIR/include/luajit-2.1
-cp $CACHE_DIR/openresty/nginx/sbin/nginx $BUILD_DIR/bin/nginx
-cp -r $CACHE_DIR/openresty/lualib $BUILD_DIR/lib/lualib
+ln -s $BUILD_DIR/openresty/luajit/bin/luajit-2.1.0-alpha $BUILD_DIR/bin/lua
+ln -s $BULD_DIR/openresty/luajit/lib/libluajit-5.1.so.2.1.0 $BUILD_DIR/lib/lubluajit-5.1.so.2
+ln -s $BUILD_DIR/openresty/luajit/include/luajit-2.1 $BUILD_DIR/include/luajit-2.1
+ln -s $BUILD_DIR/openresty/nginx/sbin/nginx $BUILD_DIR/bin/nginx
+#ln -s $CACHE_DIR/openresty/lualib $BUILD_DIR/lib/lualib
 
+cd $CACHE_DIR
 if [ "$MAKE_CACHE" = "1" ]; then
   echo "-----> Building LuaRocks"
   wget -O - http://luarocks.org/releases/luarocks-$LUAROCKS_VERSION.tar.gz | tar xz
@@ -46,11 +48,14 @@ if [ "$MAKE_CACHE" = "1" ]; then
     --prefix=$CACHE_DIR \
     --with-lua=$BUILD_DIR \
     --with-lua-include=$BUILD_DIR/include/luajit-2.1 \
-    --rocks-tree=$BUILD_DIR\lib\luarocks
-  make && make install
+    --rocks-tree=$BUILD_DIR/lib/luarocks
+  make
   cd ..
-  rm -rf luarocks-$LUAROCKS_VERSION
 fi
+echo "-----> Installing LuaRocks"
+cd luarocks-$LUAROCKS_VERSION
+make install
+
 
 cd $BUILD_DIR
 
