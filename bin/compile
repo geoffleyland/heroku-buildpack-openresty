@@ -40,6 +40,7 @@ ln -s $BUILD_DIR/openresty/nginx/sbin/nginx $BUILD_DIR/bin/nginx
 
 if [ ! -d "$CACHE_DIR/luarocks-$LUAROCKS_VERSION" ]; then
   echo "-----> Building LuaRocks"
+  set -x
   cd $CACHE_DIR
   wget -O - http://luarocks.org/releases/luarocks-$LUAROCKS_VERSION.tar.gz | tar xz
   cd luarocks-$LUAROCKS_VERSION
