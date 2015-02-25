@@ -13,7 +13,7 @@ ROOT_DIR=$(dirname $BIN_DIR)
 BUILD_DIR=$1
 CACHE_DIR=$2
 
-cp -p $ROOT_DIR/.profile.d $BUILD_DIR
+cp -r $ROOT_DIR/.profile.d $BUILD_DIR
 
 TOOLS_DIR=$BUILD_DIR/tools
 mkdir -p $TOOLS_DIR/bin
