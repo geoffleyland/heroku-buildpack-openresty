@@ -11,9 +11,11 @@ LUAROCKS_VERSION=2.2.0
 BUILD_DIR=$1
 CACHE_DIR=$2
 
-mkdir -p $BUILD_DIR/bin
-mkdir -p $BUILD_DIR/lib
-mkdir -p $BUILD_DIR/include
+TOOLS_DIR=$BUILD_DIR/tools
+mkdir -p $TOOLS_DIR/bin
+mkdir -p $TOOLS_DIR/lib
+mkdir -p $TOOLS_DIR/include
+ln -s $TOOLS_DIR /app/tools
 
 if [ ! -d "$CACHE_DIR" ]; then
   mkdir -p $CACHE_DIR
@@ -24,7 +26,7 @@ if [ ! -d "$CACHE_DIR/ngx_openresty-$OPENRESTY_VERSION" ]; then
   echo "-----> Building openresty"
   wget -O - http://openresty.org/download/ngx_openresty-$OPENRESTY_VERSION.tar.gz | tar xz
   cd ngx_openresty-$OPENRESTY_VERSION
-  PATH=$PATH:/sbin ./configure --prefix=$BUILD_DIR/openresty --with-pcre-jit --with-ipv6
+  PATH=$PATH:/sbin ./configure --prefix=/app/tools/openresty --with-pcre-jit --with-ipv6
   make
   cd ..
 fi
@@ -32,11 +34,13 @@ echo "-----> Installing openresty"
 cd $CACHE_DIR/ngx_openresty-$OPENRESTY_VERSION
 make install
 
-ln -s $BUILD_DIR/openresty/luajit/bin/luajit-2.1.0-alpha $BUILD_DIR/bin/lua
-ln -s $BULD_DIR/openresty/luajit/lib/libluajit-5.1.so.2.1.0 $BUILD_DIR/lib/lubluajit-5.1.so.2
-ln -s $BUILD_DIR/openresty/luajit/include/luajit-2.1 $BUILD_DIR/include/luajit-2.1
-ln -s $BUILD_DIR/openresty/nginx/sbin/nginx $BUILD_DIR/bin/nginx
+ln -s $TOOLS_DIR/openresty/luajit/bin/luajit-2.1.0-alpha $TOOLS_DIR/bin/lua
+ln -s $TOOLS_DIR/openresty/luajit/lib/libluajit-5.1.so.2.1.0 $TOOLS_DIR/lib/lubluajit-5.1.so.2
+ln -s $TOOLS_DIR/openresty/luajit/include/luajit-2.1 $TOOLS_DIR/include/luajit-2.1
+ln -s $TOOLS_DIR/openresty/nginx/sbin/nginx $TOOLS_DIR/bin/nginx
 #ln -s $CACHE_DIR/openresty/lualib $BUILD_DIR/lib/lualib
+
+$TOOLS_DIR/bin/lua -e "print(package.path)"
 
 if [ ! -d "$CACHE_DIR/luarocks-$LUAROCKS_VERSION" ]; then
   echo "-----> Building LuaRocks"
@@ -45,10 +49,10 @@ if [ ! -d "$CACHE_DIR/luarocks-$LUAROCKS_VERSION" ]; then
   wget -O - http://luarocks.org/releases/luarocks-$LUAROCKS_VERSION.tar.gz | tar xz
   cd luarocks-$LUAROCKS_VERSION
   ./configure \
-    --prefix=$BUILD_DIR \
+    --prefix=$TOOLS_DIR \
     --with-lua=$BUILD_DIR \
-    --with-lua-include=$BUILD_DIR/include/luajit-2.1 \
-    --rocks-tree=$BUILD_DIR/lib/luarocks
+    --with-lua-include=$TOOLS_DIR/include/luajit-2.1 \
+    --rocks-tree=$TOOLS_DIR/lib/luarocks
   make
   cd ..
 fi
@@ -64,4 +68,4 @@ ROCKSPEC=$(ls | sed -n 's/\.rockspec$/&/p' | head -n 1)
 
 echo "-----> Installing dependencies"
 echo $ROCKSPEC
-$BUILD_DIR/bin/luarocks make $ROCKSPEC
+$TOOLS_DIR/bin/luarocks make $ROCKSPEC
