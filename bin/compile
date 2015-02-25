@@ -15,15 +15,12 @@ mkdir -p $BUILD_DIR/bin
 mkdir -p $BUILD_DIR/lib
 mkdir -p $BUILD_DIR/include
 
-echo "CACHE DIR" $CACHE_DIR
-ls $CACHE_DIR
-
 if [ ! -d "$CACHE_DIR" ]; then
   mkdir -p $CACHE_DIR
 fi
 
-cd $CACHE_DIR
 if [ ! -d "$CACHE_DIR/ngx_openresty-$OPENRESTY_VERSION" ]; then
+  cd $CACHE_DIR
   echo "-----> Building openresty"
   wget -O - http://openresty.org/download/ngx_openresty-$OPENRESTY_VERSION.tar.gz | tar xz
   cd ngx_openresty-$OPENRESTY_VERSION
@@ -32,7 +29,7 @@ if [ ! -d "$CACHE_DIR/ngx_openresty-$OPENRESTY_VERSION" ]; then
   cd ..
 fi
 echo "-----> Installing openresty"
-cd ngx_openresty-$OPENRESTY_VERSION
+cd $CACHE_DIR/ngx_openresty-$OPENRESTY_VERSION
 make install
 
 exit 0
@@ -43,9 +40,9 @@ ln -s $BUILD_DIR/openresty/luajit/include/luajit-2.1 $BUILD_DIR/include/luajit-2
 ln -s $BUILD_DIR/openresty/nginx/sbin/nginx $BUILD_DIR/bin/nginx
 #ln -s $CACHE_DIR/openresty/lualib $BUILD_DIR/lib/lualib
 
-cd $CACHE_DIR
-if [ "$MAKE_CACHE" = "1" ]; then
+if [ ! -d "$CACHE_DIR/luarocks-$LUAROCKS_VERSION" ]; then
   echo "-----> Building LuaRocks"
+  cd $CACHE_DIR
   wget -O - http://luarocks.org/releases/luarocks-$LUAROCKS_VERSION.tar.gz | tar xz
   cd luarocks-$LUAROCKS_VERSION
   ./configure \
@@ -57,7 +54,7 @@ if [ "$MAKE_CACHE" = "1" ]; then
   cd ..
 fi
 echo "-----> Installing LuaRocks"
-cd luarocks-$LUAROCKS_VERSION
+cd $CACHE_DIR/luarocks-$LUAROCKS_VERSION
 make install
 
 
