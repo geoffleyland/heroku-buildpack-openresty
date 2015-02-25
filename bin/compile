@@ -34,6 +34,8 @@ echo "-----> Installing openresty"
 cd $CACHE_DIR/ngx_openresty-$OPENRESTY_VERSION
 make install
 
+set -x
+
 ln -s $TOOLS_DIR/openresty/luajit/bin/luajit-2.1.0-alpha $TOOLS_DIR/bin/lua
 ln -s $TOOLS_DIR/openresty/luajit/lib/libluajit-5.1.so.2.1.0 $TOOLS_DIR/lib/lubluajit-5.1.so.2
 ln -s $TOOLS_DIR/openresty/luajit/include/luajit-2.1 $TOOLS_DIR/include/luajit-2.1
@@ -42,9 +44,10 @@ ln -s $TOOLS_DIR/openresty/nginx/sbin/nginx $TOOLS_DIR/bin/nginx
 
 $TOOLS_DIR/bin/lua -e "print(package.path)"
 
+exit 0
+
 if [ ! -d "$CACHE_DIR/luarocks-$LUAROCKS_VERSION" ]; then
   echo "-----> Building LuaRocks"
-  set -x
   cd $CACHE_DIR
   wget -O - http://luarocks.org/releases/luarocks-$LUAROCKS_VERSION.tar.gz | tar xz
   cd luarocks-$LUAROCKS_VERSION
