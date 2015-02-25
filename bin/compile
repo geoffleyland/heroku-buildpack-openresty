@@ -69,4 +69,4 @@ ROCKSPEC=$(ls | sed -n 's/\.rockspec$/&/p' | head -n 1)
 
 echo "-----> Installing dependencies"
 echo $ROCKSPEC
-$TOOLS_DIR/bin/luarocks make $ROCKSPEC
+/app/tools/bin/luarocks make $ROCKSPEC
