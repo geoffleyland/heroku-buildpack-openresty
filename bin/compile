@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # bin/compile <build-dir> <cache-dir>
 
+# Fail fast and fail hard.
+set -eo pipefail
+
 OPENRESTY_VERSION=1.7.7.2
 LUAROCKS_VERSION=2.2.0
 # It's too hard to handle all the variants of the LuaJIT version...
@@ -18,9 +21,9 @@ if [ ! -d "$CACHE_DIR" ]; then
 fi
 
 if [ "$MAKE_CACHE" = "1" ]; then
-  echo "------> Building openresty"
+  echo "-----> Building openresty"
   cd $CACHE_DIR
-  wget -O http://openresty.org/download/ngx_openresty-$OPENRESTY_VERSION.tar.gz | tar xz
+  wget -O - http://openresty.org/download/ngx_openresty-$OPENRESTY_VERSION.tar.gz | tar xz
   cd ngx_openresty-$OPENRESTY_VERSION
   PATH=$PATH:/sbin ./configure --prefix=$CACHE_DIR/openresty --with-pcre-jit --with-ipv6
   make
