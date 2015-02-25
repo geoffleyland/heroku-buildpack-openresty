@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir>
+
+OPENRESTY_VERSION=1.7.7.2
+LUAROCKS_VERSION=2.2.0
+# It's too hard to handle all the variants of the LuaJIT version...
+
+BUILD_DIR=$1
+CACHE_DIR=$2
+
+mkdir -p $BUILD_DIR/bin
+mkdir -p $BUILD_DIR/lib
+mkdir -p $BUILD_DIR/include
+
+if [ ! -d "$CACHE_DIR" ]; then
+  mkdir -p $CACHE_DIR
+  MAKE_CACHE=1
+fi
+
+if [ "$MAKE_CACHE" = "1" ]; then
+  echo "------> Building openresty"
+  cd $CACHE_DIR
+  wget -O http://openresty.org/download/ngx_openresty-$OPENRESTY_VERSION.tar.gz | tar xz
+  cd ngx_openresty-$OPENRESTY_VERSION
+  PATH=$PATH:/sbin ./configure --prefix=$CACHE_DIR/openresty --with-pcre-jit --with-ipv6
+  make
+  make install
+  cd ..
+  rm -rf ngx_openresty-$OPENRESTY_VERSION
+fi
+
+cp $CACHE_DIR/openresty/luajit/bin/luajit-2.1.0-alpha $BUILD_DIR/bin/lua
+cp $CACHE_DIR/openresty/luajit/lib/libluajit-5.1.so-2.1.0 $BUILD_DIR/lib/lubluajit-5.1.so.2
+cp -r $CACHE_DIR/openresty/luajit/include/luajit-2.1 $BUILD_DIR/include/luajit-2.1
+cp $CACHE_DIR/openresty/nginx/bin/nginx $BUILD_DIR/bin/nginx
+cp -r $CACHE_DIR/openresty/lualib $BUILD_DIR/lib/lualib
+
+if [ "$MAKE_CACHE" = "1" ]; then
+  echo "-----> Building LuaRocks"
+  wget -O - http://luarocks.org/releases/luarocks-$LUAROCKS_VERSION.tar.gz | tar xz
+  cd luarocks-$LUAROCKS_VERSION
+  ./configure \
+    --prefix=$CACHE_DIR \
+    --with-lua=$BUILD_DIR \
+    --with-lua-include=$BUILD_DIR/include/luajit-2.1 \
+    --rocks-tree=$BUILD_DIR\lib\luarocks
+  make && make install
+  cd ..
+  rm -rf luarocks-$LUAROCKS_VERSION
+fi
+
+cd $BUILD_DIR
+
+# use sed because grep halts script with -e when there is no match
+ROCKSPEC=$(ls | sed -n 's/\.rockspec$/&/p' | head -n 1)
+
+echo "-----> Installing dependencies"
+$CACHE_DIR/bin/luarocks make $ROCKSPEC

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# bin/detect <build-dir>
+
+if [[ $(ls $1/*.rockspec 2> /dev/null | wc -l) -gt 0 ]]; then
+  echo "Lua" && exit 0
+else
+  && exit 1
+fi
