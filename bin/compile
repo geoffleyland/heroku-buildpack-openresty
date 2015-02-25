@@ -8,8 +8,12 @@ OPENRESTY_VERSION=1.7.7.2
 LUAROCKS_VERSION=2.2.0
 # It's too hard to handle all the variants of the LuaJIT version...
 
+BIN_DIR=$(cd $(dirname $0); pwd)
+ROOT_DIR=$(dirname $BIN_DIR)
 BUILD_DIR=$1
 CACHE_DIR=$2
+
+cp -p $ROOT_DIR/.profile.d $BUILD_DIR
 
 TOOLS_DIR=$BUILD_DIR/tools
 mkdir -p $TOOLS_DIR/bin
