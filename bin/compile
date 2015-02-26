@@ -13,6 +13,7 @@ ROOT_DIR=$(dirname $BIN_DIR)
 BUILD_DIR=$1
 CACHE_DIR=$2
 
+echo "-----> Creating profile.d"
 cp -r $ROOT_DIR/.profile.d $BUILD_DIR
 
 TOOLS_DIR=$BUILD_DIR/tools
@@ -25,31 +26,32 @@ if [ ! -d "$CACHE_DIR" ]; then
   mkdir -p $CACHE_DIR
 fi
 
+# Install OpenResty
+
 if [ ! -d "$CACHE_DIR/ngx_openresty-$OPENRESTY_VERSION" ]; then
   cd $CACHE_DIR
-  echo "-----> Building openresty"
+  echo "-----> Building openresty $OPENRESTY_VERSION"
   wget -O - http://openresty.org/download/ngx_openresty-$OPENRESTY_VERSION.tar.gz | tar xz
   cd ngx_openresty-$OPENRESTY_VERSION
   PATH=$PATH:/sbin ./configure --prefix=/app/tools/openresty --with-pcre-jit --with-ipv6
   make
   cd ..
 fi
-echo "-----> Installing openresty"
+echo "-----> Installing openresty $OPENRESTY_VERSION"
 cd $CACHE_DIR/ngx_openresty-$OPENRESTY_VERSION
 make install
-
-set -x
+mkdir -p $BUILD_DIR/logs
 
 ln -s /app/tools/openresty/luajit/bin/luajit-2.1.0-alpha /app/tools/bin/lua
 ln -s /app/tools/openresty/luajit/lib/libluajit-5.1.so.2.1.0 /app/tools/lib/libluajit-5.1.so.2
 ln -s /app/tools/openresty/luajit/include/luajit-2.1 /app/tools/include/luajit-2.1
 ln -s /app/tools/openresty/nginx/sbin/nginx /app/tools/bin/nginx
-#ln -s $CACHE_DIR/openresty/lualib $BUILD_DIR/lib/lualib
 
-/app/tools/bin/lua -e "io.stderr:write(package.path)"
+
+# Install LuaRocks
 
 if [ ! -d "$CACHE_DIR/luarocks-$LUAROCKS_VERSION" ]; then
-  echo "-----> Building LuaRocks"
+  echo "-----> Building LuaRocks $LUAROCKS_VERSION"
   cd $CACHE_DIR
   wget -O - http://luarocks.org/releases/luarocks-$LUAROCKS_VERSION.tar.gz | tar xz
   cd luarocks-$LUAROCKS_VERSION
@@ -61,7 +63,7 @@ if [ ! -d "$CACHE_DIR/luarocks-$LUAROCKS_VERSION" ]; then
   make
   cd ..
 fi
-echo "-----> Installing LuaRocks"
+echo "-----> Installing LuaRocks $LUAROCKS_VERSION"
 cd $CACHE_DIR/luarocks-$LUAROCKS_VERSION
 make install
 
