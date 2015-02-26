@@ -41,7 +41,7 @@ make install
 set -x
 
 ln -s /app/tools/openresty/luajit/bin/luajit-2.1.0-alpha /app/tools/bin/lua
-ln -s /app/tools/openresty/luajit/lib/libluajit-5.1.so.2.1.0 /app/tools/lib/lubluajit-5.1.so.2
+ln -s /app/tools/openresty/luajit/lib/libluajit-5.1.so.2.1.0 /app/tools/lib/libluajit-5.1.so.2
 ln -s /app/tools/openresty/luajit/include/luajit-2.1 /app/tools/include/luajit-2.1
 ln -s /app/tools/openresty/nginx/sbin/nginx /app/tools/bin/nginx
 #ln -s $CACHE_DIR/openresty/lualib $BUILD_DIR/lib/lualib
