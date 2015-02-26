@@ -13,14 +13,15 @@ ROOT_DIR=$(dirname $BIN_DIR)
 BUILD_DIR=$1
 CACHE_DIR=$2
 
-echo "-----> Creating profile.d"
-cp -r $ROOT_DIR/.profile.d $BUILD_DIR
-
 TOOLS_DIR=$BUILD_DIR/tools
 mkdir -p $TOOLS_DIR/bin
 mkdir -p $TOOLS_DIR/lib
 mkdir -p $TOOLS_DIR/include
 ln -s $TOOLS_DIR /app/tools
+
+echo "-----> Copying profile.d and tools"
+cp -r $ROOT_DIR/.profile.d $BUILD_DIR
+cp -r $ROOT_DIR/tools $BUILD_DIR
 
 if [ ! -d "$CACHE_DIR" ]; then
   mkdir -p $CACHE_DIR
