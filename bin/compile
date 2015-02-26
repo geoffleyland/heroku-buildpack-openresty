@@ -8,16 +8,27 @@ OPENRESTY_VERSION=1.7.7.2
 LUAROCKS_VERSION=2.2.0
 # It's too hard to handle all the variants of the LuaJIT version...
 
+
 BIN_DIR=$(cd $(dirname $0); pwd)
 ROOT_DIR=$(dirname $BIN_DIR)
 BUILD_DIR=$1
 CACHE_DIR=$2
 
+# We build everything as we go, making in the cache directory, and then
+# installing into the build directory.
+# Unfortunately, the build directory is something like /tmp/build_XXX... and
+# so when we ./configure --prefix=$BUILD_DIR, some of the things we're
+# building set some ridiculous default paths.
+# So, as a hacky band-aid, we link $HOME/tools to $BUILD_DIR/tools and then
+# do our building targeting $HOME/tools.
+# That way, we get binaries in $BUILD_DIR/tools that refer to $HOME/tools.
+# There must be a better way...
 TOOLS_DIR=$BUILD_DIR/tools
 mkdir -p $TOOLS_DIR/bin
 mkdir -p $TOOLS_DIR/lib
 mkdir -p $TOOLS_DIR/include
-ln -s $TOOLS_DIR /app/tools
+ln -s $TOOLS_DIR $HOME/tools
+
 
 echo "-----> Copying profile.d and tools"
 cp -r $ROOT_DIR/.profile.d $BUILD_DIR
@@ -27,14 +38,15 @@ if [ ! -d "$CACHE_DIR" ]; then
   mkdir -p $CACHE_DIR
 fi
 
-# Install OpenResty
+
+# Download, build and install OpenResty
 
 if [ ! -d "$CACHE_DIR/ngx_openresty-$OPENRESTY_VERSION" ]; then
   cd $CACHE_DIR
   echo "-----> Building openresty $OPENRESTY_VERSION"
   wget -O - http://openresty.org/download/ngx_openresty-$OPENRESTY_VERSION.tar.gz | tar xz
   cd ngx_openresty-$OPENRESTY_VERSION
-  PATH=$PATH:/sbin ./configure --prefix=/app/tools/openresty --with-pcre-jit --with-ipv6
+  PATH=$PATH:/sbin ./configure --prefix=$TOOLS_DIR/openresty --with-pcre-jit --with-ipv6
   make
   cd ..
 fi
@@ -43,24 +55,26 @@ cd $CACHE_DIR/ngx_openresty-$OPENRESTY_VERSION
 make install
 mkdir -p $BUILD_DIR/logs
 
-ln -s /app/tools/openresty/luajit/bin/luajit-2.1.0-alpha /app/tools/bin/lua
-ln -s /app/tools/openresty/luajit/lib/libluajit-5.1.so.2.1.0 /app/tools/lib/libluajit-5.1.so.2
-ln -s /app/tools/openresty/luajit/include/luajit-2.1 /app/tools/include/luajit-2.1
-ln -s /app/tools/openresty/nginx/sbin/nginx /app/tools/bin/nginx
+# Openresty puts its binaries in all sorts of awkward places.  To make things
+# easier, we just link them to somewhere more convenient.
+# Note that we rename libluajit a little.  I'm not sure why we have to do that
+ln -s $TOOLS_DIR/openresty/luajit/bin/luajit-2.1.0-alpha $TOOLS_DIR/bin/lua
+ln -s $TOOLS_DIR/openresty/luajit/lib/libluajit-5.1.so.2.1.0 $TOOLS_DIR/lib/libluajit-5.1.so.2
+ln -s $TOOLS_DIR/openresty/luajit/include/luajit-2.1 $TOOLS_DIR/include/luajit-2.1
+ln -s $TOOLS_DIR/openresty/nginx/sbin/nginx $TOOLS_DIR/bin/nginx
 
 
-# Install LuaRocks
-
+# Download, build and install LuaRocks
 if [ ! -d "$CACHE_DIR/luarocks-$LUAROCKS_VERSION" ]; then
   echo "-----> Building LuaRocks $LUAROCKS_VERSION"
   cd $CACHE_DIR
   wget -O - http://luarocks.org/releases/luarocks-$LUAROCKS_VERSION.tar.gz | tar xz
   cd luarocks-$LUAROCKS_VERSION
   ./configure \
-    --prefix=/app/tools \
-    --with-lua=/app/tools \
-    --with-lua-include=/app/tools/include/luajit-2.1 \
-    --rocks-tree=/app/tools/lib/luarocks
+    --prefix=$TOOLS_DIR \
+    --with-lua=$TOOLS_DIR \
+    --with-lua-include=$TOOLS_DIR/include/luajit-2.1 \
+    --rocks-tree=$TOOLS_DIR/lib/luarocks
   make
   cd ..
 fi
@@ -75,9 +89,8 @@ cd $BUILD_DIR
 ROCKSPEC=$(ls | sed -n 's/\.rockspec$/&/p' | head -n 1)
 
 echo "-----> Installing dependencies"
-echo $ROCKSPEC
-PATH=/app/tools/bin:$PATH \
-LD_LIBRARY_PATH=/app/tools/lib \
-LUA_PATH=/app/tools/share/lua/5.1/?.lua \
-LUA_CPATH=/app/tools/lib/lua/5.1/?.so \
-/app/tools/bin/luarocks make $ROCKSPEC
+PATH=$TOOLS_DIR/bin:$PATH \
+LD_LIBRARY_PATH=$TOOLS_DIR/lib \
+LUA_PATH=$TOOLS_DIR/share/lua/5.1/?.lua \
+LUA_CPATH=$TOOLS_DIR/lib/lua/5.1/?.so \
+$TOOLS_DIR/bin/luarocks make $ROCKSPEC

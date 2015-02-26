@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Start nginx.  The only reason we don't do this directly is because we
+# have to replace template variables in the conf file.
+# (see tools/template.lua)
+
 DEFAULT_CONF=nginx.conf
 DEFAULT_ROOT="$(pwd)"
 

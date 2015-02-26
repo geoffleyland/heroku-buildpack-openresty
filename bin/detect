@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # bin/detect <build-dir>
 
+# See if we can find a file that ends in .rockspec
 if [[ $(ls $1/*.rockspec 2> /dev/null | wc -l) -gt 0 ]]; then
   echo "Lua" && exit 0
 else
