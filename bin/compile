@@ -14,6 +14,17 @@ ROOT_DIR=$(dirname $BIN_DIR)
 BUILD_DIR=$1
 CACHE_DIR=$2
 
+
+if [ ! -d "$CACHE_DIR" ]; then
+  mkdir -p $CACHE_DIR
+fi
+
+
+echo "-----> Copying profile.d and tools"
+cp -r $ROOT_DIR/.profile.d $BUILD_DIR
+cp -r $ROOT_DIR/tools $BUILD_DIR
+
+
 # We build everything as we go, making in the cache directory, and then
 # installing into the build directory.
 # Unfortunately, the build directory is something like /tmp/build_XXX... and
@@ -23,20 +34,8 @@ CACHE_DIR=$2
 # do our building targeting $HOME/tools.
 # That way, we get binaries in $BUILD_DIR/tools that refer to $HOME/tools.
 # There must be a better way...
-TOOLS_DIR=$BUILD_DIR/tools
-mkdir -p $TOOLS_DIR/bin
-mkdir -p $TOOLS_DIR/lib
-mkdir -p $TOOLS_DIR/include
-ln -s $TOOLS_DIR $HOME/tools
-
-
-echo "-----> Copying profile.d and tools"
-cp -r $ROOT_DIR/.profile.d $BUILD_DIR
-cp -r $ROOT_DIR/tools $BUILD_DIR
-
-if [ ! -d "$CACHE_DIR" ]; then
-  mkdir -p $CACHE_DIR
-fi
+TOOLS_DIR=$HOME/tools
+ln -s $BUILD_DIR/tools $TOOLS_DIR
 
 
 # Download, build and install OpenResty
@@ -53,7 +52,7 @@ fi
 echo "-----> Installing openresty $OPENRESTY_VERSION"
 cd $CACHE_DIR/ngx_openresty-$OPENRESTY_VERSION
 make install
-mkdir -p $BUILD_DIR/logs
+mkdir -p $TOOLS_DIR/logs
 
 # Openresty puts its binaries in all sorts of awkward places.  To make things
 # easier, we just link them to somewhere more convenient.
