@@ -52,7 +52,7 @@ fi
 echo "-----> Installing openresty $OPENRESTY_VERSION"
 cd $CACHE_DIR/ngx_openresty-$OPENRESTY_VERSION
 make install
-mkdir -p $TOOLS_DIR/logs
+mkdir -p $BUILD_DIR/logs
 
 # Openresty puts its binaries in all sorts of awkward places.  To make things
 # easier, we just link them to somewhere more convenient.
