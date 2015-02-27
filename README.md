@@ -6,7 +6,11 @@ Most of the brains in this buildpack are shamelessly copied from [Leafo's versio
 
 + This builds Openresty and LuaRocks from source, so in some sense it's easier to update when there are new releases
 
-For usage, I'll have an example project up soon...
+Usage of the buildpack itself is pretty straighforward:
+
+    heroku buildpack:set https://github.com/geoffleyland/heroku-buildpack-openresty
+
+Actually getting things to work takes a little longer.  I'll put an example project up shortly.
 
 
 # Issues
