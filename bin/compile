@@ -64,7 +64,7 @@ ln -s $TOOLS_DIR/openresty/nginx/sbin/nginx $TOOLS_DIR/bin/nginx
 
 
 # Download, build and install LuaRocks
-if [ ! -d "$CACHE_DIR/luarocks-$LUAROCKS_VERSION" ]; then
+#if [ ! -d "$CACHE_DIR/luarocks-$LUAROCKS_VERSION" ]; then
   echo "-----> Building LuaRocks $LUAROCKS_VERSION"
   cd $CACHE_DIR
   wget -O - http://luarocks.org/releases/luarocks-$LUAROCKS_VERSION.tar.gz | tar xz
@@ -73,10 +73,10 @@ if [ ! -d "$CACHE_DIR/luarocks-$LUAROCKS_VERSION" ]; then
     --prefix=$TOOLS_DIR \
     --with-lua=$TOOLS_DIR \
     --with-lua-include=$TOOLS_DIR/include/luajit-2.1 \
-    --rocks-tree=$TOOLS_DIR/lib/luarocks
+    --rocks-tree=$TOOLS_DIR
   make
   cd ..
-fi
+#fi
 echo "-----> Installing LuaRocks $LUAROCKS_VERSION"
 cd $CACHE_DIR/luarocks-$LUAROCKS_VERSION
 make install
