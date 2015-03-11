@@ -100,5 +100,5 @@ while read EXTERNAL_ROCK; do
   LD_LIBRARY_PATH=$TOOLS_DIR/lib \
   LUA_PATH=$TOOLS_DIR/share/lua/5.1/?.lua \
   LUA_CPATH=$TOOLS_DIR/lib/lua/5.1/?.so \
-  $TOOLS_DIR/bin/luarocks --verbose install $EXTERNAL_ROCK
+  $TOOLS_DIR/bin/luarocks install $EXTERNAL_ROCK
 done < external_rocks.txt
