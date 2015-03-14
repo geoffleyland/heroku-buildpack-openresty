@@ -10,7 +10,8 @@ Usage of the buildpack itself is pretty straighforward:
 
     heroku buildpack:set https://github.com/geoffleyland/heroku-buildpack-openresty
 
-Actually getting things to work takes a little longer.  I'll put an example project up shortly.
+Actually getting things to work takes a little longer - it's easier to use
+[this project template](https://github.com/geoffleyland/heroku-buildpack-openresty-template).
 
 
 # Issues
