@@ -1,0 +1,19 @@
+#!/usr/bin/env lua
+
+local p = io.popen("heroku config")
+
+local command = {}
+command[1] = 'LUA_PATH="./lua/?.lua;/usr/local/share/lua/5.1/?.lua"'
+
+for l in p:lines() do
+  local key, value = l:match("([^:]+):%s*(.*)")
+  if key then
+    command[#command+1] = ("%s='%s'"):format(key, value)
+  end
+end
+
+p:close()
+
+command[#command+1] = arg[0]:match("^(.*/)").."openresty.sh"
+
+os.execute(table.concat(command, " "))
